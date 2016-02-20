@@ -1,0 +1,29 @@
+      PROGRAM ADJ_INIT_WRITE
+      
+      IMPLICIT NONE
+      
+      INTEGER:: NXT,NYT,NZT,NN,I,J,K,NMDS,IDFIL
+      CHARACTER*80 FILENM  
+       
+      NMDS=3
+      NXT=139
+      NYT=2
+      NZT=57
+
+          FILENM='ADJSOL_OUT.DAT'
+          OPEN(IDFIL,FILE=FILENM,FORM='FORMATTED',STATUS='REPLACE'
+     &        ,ERR=9876)   
+          WRITE(IDFIL,*) (0.0,NN=1,2*NMDS) !STRUCTURE ADJOINT SOLUTION FOR STEP N         
+          WRITE(IDFIL,*) (0.0,NN=1,2*NMDS) !STRUCTURE ADJOINT SOLUTION FOR STEP N+1        
+          WRITE(IDFIL,*)
+     $      ((((0.0,I=2,NXT),J=2,NYT),K=2,NZT),NN=1,5) !FLOW ADJOINT SOLUTION FOR STEP N+1         
+          WRITE(IDFIL,*)
+     $      ((((0.0,I=2,NXT),J=2,NYT),K=2,NZT),NN=1,5) !FLOW ADJOINT SOLUTION FOR STEP N+2   
+          CLOSE(IDFIL)      
+    
+      STOP
+9876  WRITE(*,9877) FILENM
+9877  FORMAT(//,' FATAL ERROR: FILE: ',A
+     *        ,/,' CAN NOT BE OPENNED')
+      END    
+      

@@ -1,0 +1,10 @@
+*.dat
+*.*~
+*.bak
+*.out
+*.swp
+*.plt
+*.asv
+*.log
+
+00-previous/

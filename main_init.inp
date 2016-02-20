@@ -1,0 +1,44 @@
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ 
+$                                                                              $ 
+$                NONLINEAR FLUTTER ANALYSIS FOR 2D AIRFOIL                     $ 
+$                                                                              $ 
+$                                                                              $ 
+$                      DATE : 10/02/2008   TIME : 11:50 AM                     $
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ 
+$ 
+ASSIGN FEM    = freeplay.fre, PRINT=0, FORM=FREE, BOUND=SYM 
+ASSIGN MATRIX = genmass.mat,  MNAME=SMHH 
+ASSIGN MATRIX = genstiff.mat, MNAME=SKHH 
+ASSIGN MATRIX = damping.mat,  MNAME=CCHH 
+ASSIGN MATRIX = flapmass.mgh, MNAME=SMGH 
+ASSIGN MATRIX = kbeta.mat,    MNAME=KHINGE 
+ASSIGN MATRIX = restorem.mat, MNAME=KDELTAM 
+ASSIGN MATRIX = restorep.mat, MNAME=KDELTAP 
+$ 
+$ PARALLEL Computing
+CPU 10 
+debug 2
+DESSEN  1
+$ 
+CEND 
+$...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..| 
+   TITLE   = 2D AIRFOIL (MODELED BY HIGH ASPECT RAIO WING) AT M=0.0 
+   ECHO    = SORT 
+SUBCASE = 1  
+        SUBTITLE= TRANSIENT RESPONSE OF 3 D.O.F. AIFOIL WITH FREEPLAY
+        LABEL= U=0.27UF, UF= 23.9 M/S
+        NLFLTR = 10
+
+BEGIN BULK 
+$...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..| 
+$       IDPARAM METHOD  TRMSTEP FLTSTEP NEWTN   NCYC    LVRSMOO PRNTCOV
+MKPARAM 100                 40     100     1      20        1      2
+$       CFL     GAMMA   VIS2    VIS4
+         6.0    
+include 'pafoil0.inp' 
+include 'mkaero.inp'
+include 'desvars.inp'
+$...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..|                                           
+STFLOW  10      save      steady.dat    TARGCLCD.DAT         
+        WHIS.DAT
+ENDDATA

@@ -15,7 +15,7 @@ if resume == 0
     vstar = run();
 
     % prepare the homogeneous solutions
-    nus = 10;
+    nus = 40;
     w = zeros(length(vstar), nus);
     for ius = 1: nus
         % main_0.inp file
@@ -63,9 +63,9 @@ for i = 1: nus
     end
 end
 rhs = zeros(nus,1);
-for i = 1:10
+for i = 1:nus
     rhs(i) = dot(vstar, w(:,i));
-end
+end 
 v = vstar - ((M\rhs)' * w')';
 % save data
 save('v_vstar_w');
@@ -170,8 +170,13 @@ end
 % xy=sscanf(linn,'%f');
 % DV=xy(1);
 DV = 0.254000013E-03;
-adjgrad=(sum(adjgradi)+sum(adjgradi2))/DV    
 
+% window function
+t = linspace(0,1,LSTEP);
+window = 2 * (sin(t*pi) .^2);
+adjgrad = sum( (adjgradi+adjgradi2).*window' )/DV    
+
+save('everything');
 end
 
 % function V = run()
@@ -183,11 +188,9 @@ function V = run()
 %GET TARGET AIRFOIL Cp
 format long;
 sdir='thksens';
-% scomd=sprintf('zeus dir=%s main_init.inp',sdir); 
-% dos(scomd);       
-% pause(0.5);
 scomd=sprintf('zeus dir=%s main0.inp',sdir); 
 dos(scomd);            
+pause(0.5);
 
 % read in coefficients
 fid=fopen('ADJAFOIL2.DAT','r');          
@@ -201,10 +204,10 @@ fclose(fid);
 
 %READ IN values
 fid=fopen('ADJOUTP_UNST.DAT','r');  
-%linn=fgets(fid);
-% xy=sscanf(linn,'%d %d %d %f');
-% NSTEP=xy(1);
-% NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
+linn=fgets(fid);
+xy=sscanf(linn,'%d %d %d %f');
+NSTEP=xy(1);
+NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
 LSTEP = 1501;
 %LSTEP=xy(2);
 %LSTEP=LSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINTLAEROL=xy(3);

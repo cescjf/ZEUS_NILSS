@@ -6,5 +6,8 @@
 *.plt
 *.asv
 *.log
+v_vstar_w.mat
+vstar_w.mat
+everything.mat
 
 00-previous/

@@ -15,7 +15,7 @@ if resume == 0
     vstar = run();
 
     % prepare the homogeneous solutions
-    nus = 40;
+    nus = 50;
     w = zeros(length(vstar), nus);
     for ius = 1: nus
         % main_0.inp file

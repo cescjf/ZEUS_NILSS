@@ -32,7 +32,7 @@ $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..|
 $DESADJ  100     MAX     MODALV     1           
 $DESADJ  100     req     GRIDXT3   100  
 $DESADJ|ID     |MARGIN |SIGNAL |KEY    |START  |OBJRET |ENDT   |HOMO   |       |
-DESADJ  100     max      CL               2.0             5.0      1  
+DESADJ  100     max      CL               6.0            16.0      2  
 $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..| 
 $       IDPARAM METHOD  TRMSTEP FLTSTEP NEWTN   NCYC    LVRSMOO PRNTCOV
 MKPARAM 100     4           40     100     1      10        1      2

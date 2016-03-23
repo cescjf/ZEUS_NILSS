@@ -25,14 +25,33 @@ save('yAdj')
 % % adj = adj * 0.5*1.4*0.25^2;
 %% plot
 figure;
-plot(thk_row, y);
+plot(thk_row, y, '--sb','MarkerEdgeColor','k',...
+                'MarkerFaceColor','k',...
+                'MarkerSize',5);
 hold on;
 scale = (max(y)-min(y))/(thk_row(end)-thk_row(1));
 for i = 1: length(thk_row)
     width = (thk_row(2) - thk_row(1) )/ 2 / sqrt(1+(adj(i)/scale)^2);
     xx = linspace(thk_row(i)-width, thk_row(i)+width,3);
     yy = y(i)+adj(i)*(xx-thk_row(i));
-plot(xx,yy)
+    plot(xx,yy,'r')
+end
+
+% plot deviation bar
+devi = 5.169297799976361e-05 / sqrt(5) * 2; % 95 confidence interval
+for i = 1: length(thk_row)
+    xx = ones(2,1) * thk_row(i);
+    yy = [y(i) + devi, y(i)-devi];
+    plot(xx,yy,'k')
+    
+    width = (thk_row(2) - thk_row(1)) * 0.1;
+    xx = [thk_row(i) - width , thk_row(i) + width];
+    yy = [y(i) + devi, y(i)+devi];
+    plot(xx,yy,'k')
+    
+    xx = [thk_row(i) - width , thk_row(i) + width];    
+    yy = [y(i) - devi, y(i)-devi];
+    plot(xx,yy,'k')
 end
 
 end

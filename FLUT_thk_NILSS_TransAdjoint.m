@@ -1,3 +1,4 @@
+%%%%%%%%%%%% Jack Optimization %%%%%%%%%%
 % this function performs minimization on the adjoint of the whole field
 function [yy, adjgrad] = FLUT_thk_NILSS_FullAdjoint()
 sdir='thksens';
@@ -13,40 +14,41 @@ if resume == 0
     dos('copy main0_nonhomo.inp main0.inp /Y');
     % compute v*
     [vstar_obj, vstar_opt] = run(2);
-    
-    %% prepare the homogeneous solutions
-    nus = 3;
-    w_obj = zeros(length(vstar_obj), nus);
-    w_opt = zeros(length(vstar_opt), nus);
-    for ius = 1: nus
-        % main_0.inp file
-        dos('copy main0_homo.inp main0.inp /Y');
-        % copute homogeneous solutions: w
-        [w_obj(:,ius), w_opt(:,ius)] = run(1);
-    end
-    % save data
-    save('vstar_w');
-elseif resume == 1
-    load('vstar_w');
-    scomd=sprintf('zeus dir=%s main0.inp',sdir); 
-    dos(scomd);            
-    pause(0.5);
-end
 
-%% construct left matrix and right hand side, compute v
-disp('...construct left matrix and right hand side, compute v');
-M = zeros(nus, nus);
-for i = 1: nus
-    for j = 1: nus
-    M(i,j) = dot( w_opt(:,i) , w_opt(:,j));
-    end
+%     % prepare the homogeneous solutions
+%     nus = 5;
+%     w_obj = zeros(length(vstar_obj), nus);
+%     w_opt = zeros(length(vstar_opt), nus);
+%     for ius = 1: nus
+%         main_0.inp file
+%         dos('copy main0_homo.inp main0.inp /Y');
+%         copute homogeneous solutions: w
+%         [w_obj(:,ius), w_opt(:,ius)] = run(1);
+%     end
+%     save data
+%     save('vstar_w');
+% elseif resume == 1
+%     load('vstar_w');
+%     scomd=sprintf('zeus dir=%s main0.inp',sdir); 
+%     dos(scomd);            
+%     pause(0.5);
 end
-rhs = zeros(nus,1);
-for i = 1:nus
-    rhs(i) = dot(vstar_opt, w_opt(:,i));
-end  
-v_opt = vstar_opt - ((M\rhs)' * w_opt')';
-v_obj = vstar_obj - ((M\rhs)' * w_obj')';
+% 
+% % construct left matrix and right hand side, compute v
+% disp('...construct left matrix and right hand side, compute v');
+% M = zeros(nus, nus);
+% for i = 1: nus
+%     for j = 1: nus
+%     M(i,j) = dot( w_opt(:,i) , w_opt(:,j));
+%     end
+% end
+% rhs = zeros(nus,1);
+% for i = 1:nus
+%     rhs(i) = dot(vstar_opt, w_opt(:,i));
+% end  
+
+v_opt = vstar_opt;% - ((M\rhs)' * w_opt')';
+v_obj = vstar_obj;% - ((M\rhs)' * w_obj')';
 v = v_obj;
 % save data
 save('v_vstar_w');
@@ -85,7 +87,7 @@ linn=fgets(fid);
 xy=sscanf(linn,'%d %d %d %f');
 NSTEP=xy(1);
 NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
-LSTEP=2501;
+LSTEP=52;
 fclose(fid)
 
 %% run main00.inp, read in FUM and FLM
@@ -162,12 +164,14 @@ fid=fopen('GRAD_GRID.DAT','r');
 linn=fgets(fid);
 xy=sscanf(linn,'%f');
 DV=xy(1);
+fclose(fid); 
 
-% window function
-t = linspace(0,1,LSTEP);
-window = 2 * (sin(t*pi) .^2);
-adjgrad = sum( (adjgradi+adjgradi2).*window' )/DV  
+% % window function
+% t = linspace(0,1,LSTEP);
+% window = 2 * (sin(t*pi) .^2);
+% adjgrad = sum( (adjgradi+adjgradi2).*window' )/DV  
 
+adjgrad = sum( (adjgradi+adjgradi2) )/DV  
 save('everything');
 end
 
@@ -233,7 +237,7 @@ linn=fgets(fid);
 xy=sscanf(linn,'%d %d %d %f');
 NSTEP=xy(1);
 NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
-LSTEP = 2501;
+LSTEP = 52;
 %LSTEP=xy(2);
 %LSTEP=LSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINTLAEROL=xy(3);
 %DT=xy(4);

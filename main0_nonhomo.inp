@@ -18,6 +18,7 @@ $
 $ PARALLEL Computing
 CPU 10 
 debug 2
+DESSEN  1
 $ 
 CEND 
 $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..| 
@@ -32,14 +33,15 @@ $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..|
 $DESADJ  100     MAX     MODALV     1           
 $DESADJ  100     req     GRIDXT3   100  
 $DESADJ|ID     |MARGIN |SIGNAL |KEY    |START  |OBJRET |ENDT   |HOMO   |       |
-DESADJ  100     max      CL               6.0            16.0      2  
+DESADJ  100     max      CL              21.0            26.0    2  
 $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..| 
 $       IDPARAM METHOD  TRMSTEP FLTSTEP NEWTN   NCYC    LVRSMOO PRNTCOV
-MKPARAM 100     4           40     100     1      10        1      2
+MKPARAM 100     4           40     100     1      30        1      2
 $       CFL     GAMMA   VIS2    VIS4
          6.0    
 include 'pafoil0.inp' 
 include 'mkaero.inp'
+include 'desvars.inp'
 $...1..|...2...|...3...|...4...|...5...|...6...|...7...|...8...|...9...|...10..|                                           
 STFLOW  10      ACQU      steady.dat    TARGCLCD.DAT         
         WHIS.DAT

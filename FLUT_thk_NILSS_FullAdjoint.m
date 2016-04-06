@@ -1,18 +1,18 @@
 % this function performs minimization on the adjoint of the whole field
-function [yy, adjgrad] = FLUT_thk_NILSS_FullAdjoint()
+function [yy, adjgrad, devi] = FLUT_thk_NILSS_FullAdjoint(LSTEP)
 sdir='thksens';
 resume = 0;
 if resume == 0
     %% prepare the primal solution
     scomd=sprintf('zeus dir=%s main_init.inp',sdir); 
     dos(scomd);
-    pause(0.5);
+    pause(0.1);
     
     %% prepare the non-homogeneous solution
     % main0.inp file, homo =0, requires no input files
     dos('copy main0_nonhomo.inp main0.inp /Y');
     % compute v*
-    [vstar_obj, vstar_opt] = run(2);
+    [vstar_obj, vstar_opt] = run(2, LSTEP);
     
     %% prepare the homogeneous solutions
     nus = 3;
@@ -22,7 +22,7 @@ if resume == 0
         % main_0.inp file
         dos('copy main0_homo.inp main0.inp /Y');
         % copute homogeneous solutions: w
-        [w_obj(:,ius), w_opt(:,ius)] = run(1);
+        [w_obj(:,ius), w_opt(:,ius)] = run(1, LSTEP);
     end
     % save data
     save('vstar_w');
@@ -30,7 +30,7 @@ elseif resume == 1
     load('vstar_w');
     scomd=sprintf('zeus dir=%s main0.inp',sdir); 
     dos(scomd);            
-    pause(0.5);
+    pause(0.1);
 end
 
 %% construct left matrix and right hand side, compute v
@@ -85,15 +85,16 @@ linn=fgets(fid);
 xy=sscanf(linn,'%d %d %d %f');
 NSTEP=xy(1);
 NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
-LSTEP=2501;
+% LSTEP=2501;
 fclose(fid)
 
 %% run main00.inp, read in FUM and FLM
 % main00.inp computes 1) the objective function value, where the
 % integration time is longer. 2) the purterbed geometry.
+dos('copy main00_orig.inp main00.inp /Y');
 scomd=sprintf('zeus dir=%s main00.inp',sdir); 
 dos(scomd);  
-pause(0.5);        
+pause(0.1);        
 
 % read the objective function
 fid=fopen('OBJFUC.DAT','r');   
@@ -166,7 +167,47 @@ DV=xy(1);
 % window function
 t = linspace(0,1,LSTEP);
 window = 2 * (sin(t*pi) .^2);
-adjgrad = sum( (adjgradi+adjgradi2).*window' )/DV  
+adjgrad = sum( (adjgradi+adjgradi2).*window' )/DV
+
+%% compute the standard deviation
+T_start = [2,7,12,17,22];
+T_end = T_start + 5;
+obj_shortT = zeros(length(T_start),1);
+for iT = 1: length(T_start)
+    % generate new main0_homo file
+    % Read txt into cell A
+    fid = fopen('main00_orig.inp','r');
+    i = 1;
+    tline = fgetl(fid);
+    A{i} = tline;
+    while ischar(tline)
+        i = i+1;
+        tline = fgetl(fid);
+        A{i} = tline;
+    end
+    fclose(fid);
+    % Change cell A
+    A{36} = sprintf('DESADJ  100     max      CL              %0.1f     YES     %0.1f', T_start(iT), T_end(iT));
+    % Write cell A into txt
+    fid = fopen('main00.inp', 'w');
+    for i = 1:numel(A)
+        if A{i+1} == -1
+            fprintf(fid,'%s', A{i});
+            break
+        else
+            fprintf(fid,'%s\n', A{i});
+        end
+    end
+    scomd=sprintf('zeus dir=%s main00.inp',sdir); 
+    dos(scomd);  
+    pause(0.1); 
+    fid=fopen('OBJFUC.DAT','r');   
+    linn=fgets(fid);
+    temp=sscanf(linn,'%f');    
+    obj_shortT(iT) = temp(1);
+    fclose(fid);
+end
+devi = std(obj_shortT)/sqrt(5)
 
 save('everything');
 end
@@ -176,7 +217,7 @@ end
 % end
 
 %% function run
-function [V_obj, V_opt] = run(homo)
+function [V_obj, V_opt] = run(homo, LSTEP)
 % homo = 0: non-homo with 0 terminal condition
 % homo = 1: homo
 V_opt = [];
@@ -215,7 +256,7 @@ format long;
 sdir='thksens';
 scomd=sprintf('zeus dir=%s main0.inp',sdir); 
 dos(scomd);            
-pause(0.5);
+pause(0.1);
 
 % read in coefficients
 fid=fopen('ADJAFOIL2.DAT','r');          
@@ -233,7 +274,7 @@ linn=fgets(fid);
 xy=sscanf(linn,'%d %d %d %f');
 NSTEP=xy(1);
 NSTEP=NSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINT
-LSTEP = 2501;
+%LSTEP = 2501;
 %LSTEP=xy(2);
 %LSTEP=LSTEP+1; %INCLUDING THE INITIAL STEADY ADJOINTLAEROL=xy(3);
 %DT=xy(4);
